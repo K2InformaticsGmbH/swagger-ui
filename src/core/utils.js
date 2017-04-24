@@ -453,13 +453,13 @@ export const propChecker = (props, nextProps, objectList=[], ignoreList=[]) => {
 }
 
 const validateNumber = ( val ) => {
-  if ( !/^\d+(.?\d+)?$/.test(val)) {
+  if ( !/^-?\d+(.?\d+)?$/.test(val)) {
     return "Value must be a number"
   }
 }
 
 const validateInteger = ( val ) => {
-  if ( !/^\d+$/.test(val)) {
+  if ( !/^-?\d+$/.test(val)) {
     return "Value must be integer"
   }
 }
@@ -546,4 +546,23 @@ export const parseSeach = () => {
   }
 
   return map
+}
+
+export const btoa = (str) => {
+  let buffer
+
+  if (str instanceof Buffer) {
+    buffer = str
+  } else {
+    buffer = new Buffer(str.toString(), "utf-8")
+  }
+
+  return buffer.toString("base64")
+}
+
+export const sorters = {
+  operationsSorter: {
+    alpha: (a, b) => a.get("path").localeCompare(b.get("path")),
+    method: (a, b) => a.get("method").localeCompare(b.get("method"))
+  }
 }
