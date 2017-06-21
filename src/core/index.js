@@ -1,12 +1,22 @@
 import deepExtend from "deep-extend"
 
 import System from "core/system"
+import win from "core/window"
 import ApisPreset from "core/presets/apis"
 import * as AllPlugins from "core/plugins/all"
-import { filterConfigs } from "plugins/configs"
-import { parseSeach } from "core/utils"
+import { parseSeach, filterConfigs } from "core/utils"
+
+const CONFIGS = [ "url", "spec", "validatorUrl", "onComplete", "onFailure", "authorizations", "docExpansion",
+    "apisSorter", "operationsSorter", "supportedSubmitMethods", "dom_id", "defaultModelRendering", "oauth2RedirectUrl",
+    "showRequestHeaders", "custom", "modelPropertyMacro", "parameterMacro", "displayOperationId" ]
+
+// eslint-disable-next-line no-undef
+const { GIT_DIRTY, GIT_COMMIT, PACKAGE_VERSION } = buildInfo
 
 module.exports = function SwaggerUI(opts) {
+
+  win.versions = win.versions || {}
+  win.versions.swaggerUi = `${PACKAGE_VERSION}/${GIT_COMMIT || "unknown"}${GIT_DIRTY ? "-dirty" : ""}`
 
   const defaults = {
     // Some general settings, that we floated to the top
@@ -14,9 +24,11 @@ module.exports = function SwaggerUI(opts) {
     spec: {},
     url: "",
     layout: "BaseLayout",
+    docExpansion: "list",
     validatorUrl: "https://online.swagger.io/validator",
-    configs: {
-    },
+    configs: {},
+    custom: {},
+    displayOperationId: false,
 
     // Initial set of plugins ( TODO rename this, or refactor - we don't need presets _and_ plugins. Its just there for performance.
     // Instead, we can compile the first plugin ( it can be a collection of plugins ), then batch the rest.
@@ -68,14 +80,16 @@ module.exports = function SwaggerUI(opts) {
   var system = store.getSystem()
   let queryConfig = parseSeach()
 
+  system.initOAuth = system.authActions.configureAuth
+
   const downloadSpec = (fetchedConfig) => {
     if(typeof constructorConfig !== "object") {
       return system
     }
 
     let localConfig = system.specSelectors.getLocalConfig ? system.specSelectors.getLocalConfig() : {}
-    let mergedConfig = deepExtend({}, constructorConfig, localConfig, fetchedConfig || {}, queryConfig)
-    store.setConfigs(filterConfigs(mergedConfig))
+    let mergedConfig = deepExtend({}, localConfig, constructorConfig, fetchedConfig || {}, queryConfig)
+    store.setConfigs(filterConfigs(mergedConfig, CONFIGS))
 
     if (fetchedConfig !== null) {
       if (!queryConfig.url && typeof mergedConfig.spec === "object" && Object.keys(mergedConfig.spec).length) {
@@ -103,6 +117,7 @@ module.exports = function SwaggerUI(opts) {
     return downloadSpec()
   }
 
+  return system
 }
 
 // Add presets
