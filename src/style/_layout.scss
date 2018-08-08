@@ -396,8 +396,7 @@
     {
         font-size: 12px;
 
-        min-width: 100px;
-        min-width: 90px;
+        min-width: 60px;
         padding: 0;
 
         cursor: pointer;
@@ -409,6 +408,7 @@
             position: relative;
 
             padding-left: 0;
+            padding-right: 12px;
 
             &:after
             {
@@ -794,5 +794,32 @@ a.nostyle {
     text-decoration: inherit;
     color: inherit;
     cursor: pointer;
+  }
+}
+
+.version-pragma {
+  height: 100%;
+  padding: 5em 0px;
+
+  &__message {
+    display: flex;
+    justify-content: center;
+    height: 100%;
+    font-size: 1.2em;
+    text-align: center;
+    line-height: 1.5em;
+
+    padding: 0px .6em;
+
+    > div {
+      max-width: 55ch;
+      flex: 1;
+    }
+
+    code {
+      background-color: #dedede;
+      padding: 4px 4px 2px;
+      white-space: pre;
+    }
   }
 }
